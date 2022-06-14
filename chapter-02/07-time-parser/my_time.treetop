@@ -1,0 +1,76 @@
+grammar MyTime
+  rule time
+    hour_minutes_am_pm / hour_and_minutes / hour_am_pm
+  end
+
+  rule hour_minutes_am_pm
+    arg1:one_to_twelve arg2:minutes arg3:am_pm {
+      def eval
+        (arg1.eval * 60) + arg2.eval + arg3.eval
+      end
+    }
+  end
+
+  rule hour_am_pm
+    arg1:one_to_twelve arg2:am_pm {
+      def eval
+        (arg1.eval * 60) + arg2.eval
+      end
+    }
+  end
+
+  rule am_pm
+    [ap] 'm' {
+      def eval
+        text_value == 'pm' ? 12 * 60 : 0
+      end
+    }
+  end
+
+  rule hour_and_minutes
+    arg1:(zero_to_twenty_three / one_to_twelve) arg2:minutes {
+      def eval
+        (arg1.eval * 60) + arg2.eval
+      end
+    }
+  end
+
+  rule one_to_twelve
+    arg1:(ten_to_twelve / one_to_nine) {
+      def eval
+        hour = arg1.eval
+        return 0 if hour == 12
+        
+        hour
+      end
+    }
+  end
+
+  rule zero_to_twenty_three
+    [0-1] [0-9] / '2' [0-3] <Integer>
+  end
+
+  rule ten_to_twelve
+    '1' [0-2] <Integer>
+  end
+
+  rule one_to_nine
+    [1-9] <Integer>
+  end
+
+  rule minutes
+    ':' arg1:zero_to_five arg2:zero_to_nine {
+      def eval
+        (arg1.eval * 10) + arg2.eval
+      end
+    }
+  end
+
+  rule zero_to_five
+    [0-5] <Integer>
+  end
+
+  rule zero_to_nine
+    [0-9] <Integer>
+  end
+end
